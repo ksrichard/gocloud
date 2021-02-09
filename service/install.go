@@ -170,6 +170,19 @@ func InstallPulumi() error {
 	return util.BoldError("Sorry, at the moment we do not support your OS!")
 }
 
+func PreparePulumiPath() error {
+	// set path to include pulumi bin dir
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	err = os.Setenv("PATH", fmt.Sprintf("%s:%s/.pulumi/bin", os.Getenv("PATH"), homeDir))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func InstallPulumiUnix() error {
 	err := util.DefaultLoading(func() error {
 		// check curl
@@ -186,16 +199,6 @@ func InstallPulumiUnix() error {
 
 		// pipe it to sh
 		err, _ = util.RunCmdIn(installBashOut, "sh")
-		if err != nil {
-			return err
-		}
-
-		// set path to include pulumi bin dir
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return err
-		}
-		err = os.Setenv("PATH", fmt.Sprintf("%s:%s/.pulumi/bin", os.Getenv("PATH"), homeDir))
 		if err != nil {
 			return err
 		}

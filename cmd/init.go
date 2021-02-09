@@ -22,18 +22,12 @@ import (
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Initialize cloud-native project",
-	Long:  `Initialize cloud-native project in a specific directory`,
+	Use:     "init",
+	Short:   "Initialize cloud-native project",
+	Long:    `Initialize cloud-native project in a specific directory`,
+	PreRunE: service.CheckRequirementsCobra,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// check requirements to run project initialization
-		err := service.CheckRequirements()
-		if err != nil {
-			return err
-		}
-
 		// TODO: continue flow: select template -> set options for template ()
-
 		return nil
 	},
 }
