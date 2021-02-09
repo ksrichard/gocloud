@@ -16,27 +16,30 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"github.com/ksrichard/gocloud/service"
 	"github.com/spf13/cobra"
-	"os"
 )
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "gocloud",
-	Short: "Kick-start any cloud native project",
-	Long: `Kick-start any cloud native project in your favourite programming language and go live in seconds
-`,
-}
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initialize cloud-native project",
+	Long:  `Initialize cloud-native project in a specific directory`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// check requirements to run project initialization
+		err := service.CheckRequirements()
+		if err != nil {
+			return err
+		}
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+		// TODO: continue flow: select template -> set options for template ()
+
+		return nil
+	},
 }
 
 func init() {
+	rootCmd.AddCommand(initCmd)
+
+	// TODO: add parameters when flow is done
 }

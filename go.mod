@@ -1,5 +1,12 @@
-module gocloud
+module github.com/ksrichard/gocloud
 
 go 1.15
 
-require github.com/spf13/cobra v1.1.1 // indirect
+require (
+	github.com/briandowns/spinner v1.11.1
+	github.com/fatih/color v1.7.0
+	github.com/kyokomi/emoji/v2 v2.2.8
+	github.com/manifoldco/promptui v0.8.0
+	github.com/matishsiao/goInfo v0.0.0-20200404012835-b5f882ee2288
+	github.com/spf13/cobra v1.1.1
+)
