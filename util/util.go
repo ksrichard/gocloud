@@ -23,3 +23,7 @@ func CreateDir(folderPath string) error {
 	}
 	return os.MkdirAll(folderPath, os.ModePerm)
 }
+
+func InitCliHomeDir() {
+	// TODO: implement
+}

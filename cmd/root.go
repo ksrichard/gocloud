@@ -17,16 +17,19 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"os"
 )
+
+var templateDir string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gocloud",
 	Short: "Kick-start any cloud native project",
-	Long: `Kick-start any cloud native project in your favourite programming language and go live in seconds
-`,
+	Long:  `Kick-start any cloud native project in your favourite programming language`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -39,4 +42,26 @@ func Execute() {
 }
 
 func init() {
+	homeDir, err := homedir.Dir()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	templateDir := homeDir + "/gocloud-templates"
+	rootCmd.PersistentFlags().StringVarP(&templateDir, "template-dir", "t", templateDir,
+		`Template directory to download and store project templates,
+it can be set by setting GOCLOUD_TEMPLATE_DIR as well`,
+	)
+	rootCmd.MarkPersistentFlagDirname("template-dir")
+	rootCmd.MarkFlagRequired("template-dir")
+
+	viper.AutomaticEnv()
+
+	templateDirEnv := viper.GetString("gocloud_template_dir")
+	if templateDirEnv != "" {
+		templateDir = templateDirEnv
+	}
+
+	// create and checkout templates
+	// TODO: implement this part
 }

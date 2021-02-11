@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"github.com/ksrichard/gocloud/service"
 	"github.com/spf13/cobra"
 )
@@ -28,6 +29,9 @@ var initCmd = &cobra.Command{
 	PreRunE: service.CheckRequirementsCobra,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// TODO: continue flow: select template -> set options for template ()
+
+		fmt.Println(cmd.Flag("template-dir").Value)
+
 		return nil
 	},
 }
