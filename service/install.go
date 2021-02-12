@@ -184,7 +184,12 @@ func PreparePulumiPath() error {
 }
 
 func InstallPulumiUnix() error {
-	err := util.DefaultLoading(func() error {
+	err := PreparePulumiPath()
+	if err != nil {
+		return err
+	}
+
+	err = util.DefaultLoading(func() error {
 		// check curl
 		cmdExistsErr := commandExists("curl")
 		if cmdExistsErr != nil {

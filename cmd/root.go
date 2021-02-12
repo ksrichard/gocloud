@@ -17,6 +17,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/ksrichard/gocloud/service"
+	"github.com/ksrichard/gocloud/util"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -24,6 +26,7 @@ import (
 )
 
 var templateDir string
+var templateRepo string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -42,6 +45,27 @@ func Execute() {
 }
 
 func init() {
+	// check automatically requirements
+	requirementsErr := service.CheckRequirements([]string{"pulumi"})
+	if requirementsErr != nil {
+		fmt.Println(requirementsErr)
+		os.Exit(1)
+	}
+
+	// templates git repo
+	templateRepo := "https://github.com/ksrichard/gocloud-templates"
+	rootCmd.PersistentFlags().StringVarP(&templateRepo, "template-repo", "r", templateRepo,
+		`Project template repository, it can be set by setting GOCLOUD_TEMPLATE_REPOSITORY env variable as well`,
+	)
+	rootCmd.MarkPersistentFlagDirname("template-repo")
+	rootCmd.MarkFlagRequired("template-repo")
+	viper.AutomaticEnv()
+	templateRepoEnv := viper.GetString("gocloud_template_repository")
+	if templateRepoEnv != "" {
+		templateRepo = templateRepoEnv
+	}
+
+	// template download dir
 	homeDir, err := homedir.Dir()
 	if err != nil {
 		fmt.Println(err)
@@ -50,18 +74,27 @@ func init() {
 	templateDir := homeDir + "/gocloud-templates"
 	rootCmd.PersistentFlags().StringVarP(&templateDir, "template-dir", "t", templateDir,
 		`Template directory to download and store project templates,
-it can be set by setting GOCLOUD_TEMPLATE_DIR as well`,
+it can be set by setting GOCLOUD_TEMPLATE_DIR env variable as well`,
 	)
 	rootCmd.MarkPersistentFlagDirname("template-dir")
 	rootCmd.MarkFlagRequired("template-dir")
-
 	viper.AutomaticEnv()
-
 	templateDirEnv := viper.GetString("gocloud_template_dir")
 	if templateDirEnv != "" {
 		templateDir = templateDirEnv
 	}
 
-	// create and checkout templates
-	// TODO: implement this part
+	// create/check templates dir
+	initErr := util.InitCliHomeDir(templateDir)
+	if initErr != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	cloneErr := util.CloneAndPullTemplatesRepo(templateRepo, templateDir)
+	if cloneErr != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 }

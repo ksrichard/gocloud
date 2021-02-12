@@ -4,38 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ksrichard/gocloud/util"
-	"github.com/spf13/cobra"
 	"os/exec"
 )
 
-func CheckRequirementsCobra(cmd *cobra.Command, args []string) error {
-	// check requirements to run project initialization
-	err := CheckRequirements()
-	if err != nil {
-		return err
+// TODO: add input options, if they are set they will be used (like automatically install requirements or so...)
+func CheckRequirements(requirements []string) error {
+	for _, requirement := range requirements {
+		err := CheckRequirement(requirement)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
-}
-
-// TODO: add input options, if they are set they will be used (like automatically install requirements or so...)
-func CheckRequirements() error {
-	err := PreparePulumiPath()
-	if err != nil {
-		return err
-	}
-
-	err = CheckRequirement("pulumi")
-	if err != nil {
-		return err
-	}
-
-	err = CheckRequirement("kubectl")
-	if err != nil {
-		return err
-	}
-
-	return err
 }
 
 // TODO: add input options, if they are set they will be used (like automatically install requirements or so...)
