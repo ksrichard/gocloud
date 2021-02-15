@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/briandowns/spinner"
 	"github.com/ksrichard/gocloud/util"
 	"os/exec"
 )
@@ -15,13 +16,12 @@ func CheckRequirements(requirements []string) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
 // TODO: add input options, if they are set they will be used (like automatically install requirements or so...)
 func CheckRequirement(command string) error {
-	err := util.DefaultLoading(func() error {
+	err := util.DefaultLoading(func(sp *spinner.Spinner) error {
 		cmdExistsErr := commandExists(command)
 		if cmdExistsErr != nil {
 			return cmdExistsErr

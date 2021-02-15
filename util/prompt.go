@@ -19,6 +19,24 @@ func YesNoPrompt(label string) bool {
 	return true
 }
 
+func SimplePrompt(prompt *promptui.Prompt, confirmable bool) (interface{}, error) {
+	value, err := prompt.Run()
+
+	if err != nil && confirmable {
+		return false, nil
+	}
+
+	if err != nil && !confirmable {
+		return nil, err
+	}
+
+	if err == nil && confirmable {
+		return true, nil
+	}
+
+	return value, nil
+}
+
 func Select(label string, items map[string]interface{}) (interface{}, error) {
 	var promptItems []string
 	for k, _ := range items {

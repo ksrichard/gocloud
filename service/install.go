@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"github.com/briandowns/spinner"
 	"github.com/ksrichard/gocloud/util"
 	"github.com/matishsiao/goInfo"
 	"os"
@@ -44,7 +45,7 @@ func InstallKubectl() error {
 }
 
 func InstallKubectlLinux() error {
-	err := util.DefaultLoading(func() error {
+	err := util.DefaultLoading(func(sp *spinner.Spinner) error {
 		// check curl
 		cmdExistsErr := commandExists("curl")
 		if cmdExistsErr != nil {
@@ -101,7 +102,7 @@ func InstallKubectlLinux() error {
 }
 
 func InstallKubectlDarwin() error {
-	err := util.DefaultLoading(func() error {
+	err := util.DefaultLoading(func(sp *spinner.Spinner) error {
 		// check curl
 		cmdExistsErr := commandExists("curl")
 		if cmdExistsErr != nil {
@@ -189,7 +190,7 @@ func InstallPulumiUnix() error {
 		return err
 	}
 
-	err = util.DefaultLoading(func() error {
+	err = util.DefaultLoading(func(sp *spinner.Spinner) error {
 		// check curl
 		cmdExistsErr := commandExists("curl")
 		if cmdExistsErr != nil {

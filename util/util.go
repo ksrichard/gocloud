@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
 	"os"
 )
@@ -38,7 +39,7 @@ func FileExists(filename string) bool {
 
 func InitCliHomeDir(templateDir string) error {
 	if !IsDir(templateDir) {
-		return DefaultLoading(func() error {
+		return DefaultLoading(func(sp *spinner.Spinner) error {
 			return CreateDir(templateDir)
 		},
 			fmt.Sprintf("'%s' does not exists or not a directory, creating it now...", templateDir),
@@ -49,7 +50,7 @@ func InitCliHomeDir(templateDir string) error {
 }
 
 func CloneAndPullTemplatesRepo(repo string, templateDir string) error {
-	return DefaultLoading(func() error {
+	return DefaultLoading(func(sp *spinner.Spinner) error {
 		// clone
 		repository, err := git.PlainClone(templateDir, false, &git.CloneOptions{
 			URL: repo,

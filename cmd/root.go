@@ -72,7 +72,7 @@ func init() {
 		os.Exit(1)
 	}
 	templateDir := homeDir + "/gocloud-templates"
-	rootCmd.PersistentFlags().StringVarP(&templateDir, "template-dir", "t", templateDir,
+	rootCmd.PersistentFlags().StringVarP(&templateDir, "template-dir", "d", templateDir,
 		`Template directory to download and store project templates,
 it can be set by setting GOCLOUD_TEMPLATE_DIR env variable as well`,
 	)
