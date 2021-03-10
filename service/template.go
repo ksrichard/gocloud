@@ -7,10 +7,13 @@ import (
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
 var TemplatesYamlFileName = "templates.yaml"
+var ProjectTemplateYamlFileName = "project.yaml"
+var ProjectYamlFileName = ".gocloud.yaml"
 
 func GetTemplateProjectYaml(templateDir string) (*model.Templates, error) {
 	var templateProject model.Templates
@@ -54,9 +57,9 @@ func GetAllTemplates(projectDir string) ([]model.Template, error) {
 	return result, nil
 }
 
-func GetProjectYaml(projectDir string) (*model.Template, error) {
+func GetProjectTemplateYaml(projectDir string) (*model.Template, error) {
 	var result model.Template
-	templateYaml := fmt.Sprintf("%s/project.yaml", projectDir)
+	templateYaml := fmt.Sprintf("%s/%s", projectDir, ProjectTemplateYamlFileName)
 	if util.FileExists(templateYaml) {
 		var tmpl model.Template
 		yamlFile, err := ioutil.ReadFile(templateYaml)
@@ -71,6 +74,36 @@ func GetProjectYaml(projectDir string) (*model.Template, error) {
 		result = tmpl
 	}
 	return &result, nil
+}
+
+func GetProjectYaml(projectDir string) (*model.ProjectConfig, error) {
+	var result model.ProjectConfig
+	templateYaml := fmt.Sprintf("%s/%s", projectDir, ProjectYamlFileName)
+	if util.FileExists(templateYaml) {
+		var tmpl model.ProjectConfig
+		yamlFile, err := ioutil.ReadFile(templateYaml)
+		if err != nil {
+			return nil, err
+		}
+		err = yaml.Unmarshal(yamlFile, &tmpl)
+		if err != nil {
+			return nil, err
+		}
+		result = tmpl
+	} else {
+		return nil, util.BoldError(fmt.Sprintf("'%s' not found!", templateYaml))
+	}
+	return &result, nil
+}
+
+func WriteProjectYaml(projectDir string, config *model.ProjectConfig) error {
+	data, err := yaml.Marshal(config)
+	if err != nil {
+		return err
+	}
+	projectYamlFile := fmt.Sprintf("%s/%s", projectDir, ProjectYamlFileName)
+	err = ioutil.WriteFile(projectYamlFile, data, os.ModePerm)
+	return err
 }
 
 func ValidateRequired(input string, required bool) error {

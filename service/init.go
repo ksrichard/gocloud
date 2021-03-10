@@ -8,6 +8,7 @@ import (
 	"github.com/ksrichard/gocloud/util"
 	gogen "github.com/ksrichard/gogen/service"
 	"github.com/spf13/cobra"
+	"os"
 	"strings"
 )
 
@@ -66,7 +67,32 @@ func InitProject(cmd *cobra.Command) error {
 
 	// generate project files
 	err = util.DefaultLoading(func(sp *spinner.Spinner) error {
-		return gogen.Generate(template.Folder, targetDir, "folder", template.PropertyValues)
+		err := gogen.Generate(template.Folder, targetDir, "folder", template.PropertyValues)
+		if err != nil {
+			return err
+		}
+
+		// delete project template yaml
+		projectTemplateYaml, err := GetProjectTemplateYaml(targetDir)
+		if err != nil {
+			return err
+		}
+		err = os.Remove(fmt.Sprintf("%s/%s", targetDir, ProjectTemplateYamlFileName))
+		if err != nil {
+			return err
+		}
+
+		// create project specific yaml
+		projectYaml := &model.ProjectConfig{
+			PulumiStack:       fmt.Sprintf("%v", template.PropertyValues["stack"]),        // TODO: add pulumi stack and pulumi project name fixed in project templates
+			PulumiProjectName: fmt.Sprintf("%v", template.PropertyValues["project_name"]), // TODO: add pulumi stack and pulumi project name fixed in project templates
+			InstallScripts:    projectTemplateYaml.InstallScripts,
+			UpScripts:         projectTemplateYaml.UpScripts,
+			DownScripts:       projectTemplateYaml.DownScripts,
+		}
+		err = WriteProjectYaml(targetDir, projectYaml)
+
+		return err
 	}, "Generating new project...", ":robot:")
 	if err != nil {
 		return err

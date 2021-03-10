@@ -12,13 +12,22 @@ type TemplateProject struct {
 	Folder string `yaml:"folder"`
 }
 
+type ProjectConfig struct {
+	PulumiProjectName string           `yaml:"pulumi_project_name"`
+	PulumiStack       string           `yaml:"pulumi_stack"`
+	InstallScripts    []TemplateScript `yaml:"install_script"`
+	UpScripts         []TemplateScript `yaml:"up_script"`
+	DownScripts       []TemplateScript `yaml:"down_script"`
+}
+
 type Template struct {
 	Folder         string
 	Name           string             `yaml:"name"`
 	Description    string             `yaml:"description"`
 	Requirements   []string           `yaml:"requirements"`
 	InstallScripts []TemplateScript   `yaml:"install_script"`
-	RunScripts     []TemplateScript   `yaml:"run_script"`
+	UpScripts      []TemplateScript   `yaml:"up_script"`
+	DownScripts    []TemplateScript   `yaml:"down_script"`
 	Properties     []TemplateProperty `yaml:"properties"`
 	PropertyValues map[string]interface{}
 }
