@@ -96,3 +96,47 @@ func DestroyProject(cmd *cobra.Command) error {
 
 	return nil
 }
+
+func InstallProject(cmd *cobra.Command) error {
+	projectDir := cmd.Flag("project-dir").Value.String()
+	template, err := GetProjectYaml(projectDir)
+	if err != nil {
+		return err
+	}
+
+	// run start script
+	err = util.DefaultLoading(func(sp *spinner.Spinner) error {
+		// get install script
+		os := GetOS()
+		runScript := ""
+		for _, script := range template.InstallScripts {
+			if strings.ToLower(script.OS) == os {
+				runScript = script.Script
+			}
+		}
+
+		if os == "darwin" || os == "linux" {
+			// chmod
+			chmodErr, _ := util.RunCmdInDir(projectDir, "chmod", "+x", runScript)
+			if chmodErr != nil {
+				return chmodErr
+			}
+
+			sp.Lock()
+			fmt.Println()
+			// run script
+			cmdErr := util.RunCmdInteractiveInDir(projectDir, "/bin/sh", runScript)
+			sp.Unlock()
+			fmt.Println()
+
+			return cmdErr
+		}
+
+		return errors.New("Failed to install project, not supported OS!")
+	}, "Initializing project...", ":robot:")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
