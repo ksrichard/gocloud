@@ -13,11 +13,9 @@ type TemplateProject struct {
 }
 
 type ProjectConfig struct {
-	PulumiProjectName string           `yaml:"pulumi_project_name"`
-	PulumiStack       string           `yaml:"pulumi_stack"`
-	InstallScripts    []TemplateScript `yaml:"install_script"`
-	UpScripts         []TemplateScript `yaml:"up_script"`
-	DownScripts       []TemplateScript `yaml:"down_script"`
+	InstallScripts []TemplateScript `yaml:"install_script"`
+	UpScripts      []TemplateScript `yaml:"up_script"`
+	DownScripts    []TemplateScript `yaml:"down_script"`
 }
 
 type Template struct {
