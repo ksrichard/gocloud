@@ -84,8 +84,8 @@ func InitProject(cmd *cobra.Command) error {
 
 		// create project specific yaml
 		projectYaml := &model.ProjectConfig{
-			PulumiStack:       fmt.Sprintf("%v", template.PropertyValues["stack"]),        // TODO: add pulumi stack and pulumi project name fixed in project templates
-			PulumiProjectName: fmt.Sprintf("%v", template.PropertyValues["project_name"]), // TODO: add pulumi stack and pulumi project name fixed in project templates
+			PulumiStack:       fmt.Sprintf("%v", template.PropertyValues["pulumi_stack_name"]),   // TODO: add pulumi stack and pulumi project name fixed in project templates
+			PulumiProjectName: fmt.Sprintf("%v", template.PropertyValues["pulumi_project_name"]), // TODO: add pulumi stack and pulumi project name fixed in project templates
 			InstallScripts:    projectTemplateYaml.InstallScripts,
 			UpScripts:         projectTemplateYaml.UpScripts,
 			DownScripts:       projectTemplateYaml.DownScripts,
