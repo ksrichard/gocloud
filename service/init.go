@@ -17,6 +17,12 @@ func InitProject(cmd *cobra.Command) error {
 	targetDir := cmd.Flag("target-dir").Value.String()
 	pulumiLocalLogin, _ := cmd.Flags().GetBool("pulumi-local")
 
+	// check if target dir is empty
+	targetDirEmpty, _ := util.IsDirEmpty(targetDir)
+	if util.IsDir(targetDir) && !targetDirEmpty {
+		return util.BoldError(fmt.Sprintf("Target directory '%s' is NOT empty!", targetDir))
+	}
+
 	// get template project yaml
 	templateProject, err := GetTemplateProjectYaml(templateDir)
 	if err != nil {
@@ -28,7 +34,7 @@ func InitProject(cmd *cobra.Command) error {
 	for _, project := range templateProject.Projects {
 		templateProjectItemsMapping[util.Bold().Sprint(project.Title)] = project
 	}
-	selectedProject, err := util.Select("Please select a project", templateProjectItemsMapping)
+	selectedProject, err := util.Select("Please select a category", templateProjectItemsMapping)
 	if err != nil {
 		return err
 	}
@@ -63,11 +69,17 @@ func InitProject(cmd *cobra.Command) error {
 	}
 
 	// pass local login option to template generation
-	template.PropertyValues["pulumi_local_login"] = pulumiLocalLogin
+	template.PropertyValues["pulumi_local_login"] = model.PropertyValue{
+		Value:                pulumiLocalLogin,
+		IsPulumiOutput:       false,
+		PulumiStackReference: "",
+		PulumiOutputVar:      "",
+	}
 
 	// generate project files
 	err = util.DefaultLoading(func(sp *spinner.Spinner) error {
-		err := gogen.Generate(template.Folder, targetDir, "folder", template.PropertyValues)
+		propValues := template.PropertyValues
+		err := gogen.Generate(template.Folder, targetDir, "folder", propValues)
 		if err != nil {
 			return err
 		}

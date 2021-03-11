@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
+	"io"
 	"os"
 )
 
@@ -27,6 +28,23 @@ func CreateDir(folderPath string) error {
 		return nil
 	}
 	return os.MkdirAll(folderPath, os.ModePerm)
+}
+
+func IsDirEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	// read in ONLY one file
+	_, err = f.Readdir(1)
+
+	// and if the file is EOF... well, the dir is empty.
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err
 }
 
 func FileExists(filename string) bool {

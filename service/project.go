@@ -6,8 +6,53 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/ksrichard/gocloud/util"
 	"github.com/spf13/cobra"
+	"os"
+	"path/filepath"
 	"strings"
 )
+
+func GetOutputVarsFromOtherProjects() (map[string]interface{}, error) {
+	result := make(map[string]interface{})
+
+	err := filepath.Walk(".",
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if util.IsDir(path) {
+				projectYamlFile := fmt.Sprintf("%s/%s", path, ProjectYamlFileName)
+				if util.FileExists(projectYamlFile) {
+					// get current pulumi user
+					currentPulumiUser, err := GetCurrentPulumiUser(path)
+					if err != nil {
+						return err
+					}
+
+					// get project name
+					currentPulumiProjectName, err := GetPulumiProjectName(path)
+					if err != nil {
+						return err
+					}
+
+					prefix := fmt.Sprintf("%s/%s", currentPulumiUser, currentPulumiProjectName)
+					outputVars, err := GetPulumiProjectVars(path)
+					if err != nil {
+						return err
+					}
+					for _, outputVar := range outputVars {
+						result[fmt.Sprintf("%s/%s", prefix, outputVar)] = fmt.Sprintf("%s/%s", prefix, outputVar)
+					}
+
+				}
+			}
+			return nil
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
 
 func StartProject(cmd *cobra.Command) error {
 	projectDir := cmd.Flag("project-dir").Value.String()

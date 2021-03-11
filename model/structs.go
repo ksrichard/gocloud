@@ -30,16 +30,28 @@ type Template struct {
 	PropertyValues map[string]interface{}
 }
 
+type PropertyValue struct {
+	Value                interface{}
+	IsPulumiOutput       bool
+	PulumiStackReference string
+	PulumiOutputVar      string
+}
+
 type TemplateScript struct {
 	OS     string `yaml:"os"`
 	Script string `yaml:"script"`
 }
 
 type TemplateProperty struct {
-	Name        string   `yaml:"name"`
-	Type        string   `yaml:"type"`
-	Description string   `yaml:"description"`
-	Required    bool     `yaml:"required"`
-	Requires    []string `yaml:"requires"`
-	Prompt      *promptui.Prompt
+	Name                  string   `yaml:"name"`
+	Type                  string   `yaml:"type"`
+	Description           string   `yaml:"description"`
+	Required              bool     `yaml:"required"`
+	CanHaveOutputVarValue bool     `yaml:"canHaveOutputVarValue"`
+	Requires              []string `yaml:"requires"`
+	Prompt                *promptui.Prompt
+}
+
+type PulumiYaml struct {
+	Name string `yaml:"name"`
 }

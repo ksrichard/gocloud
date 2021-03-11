@@ -167,14 +167,49 @@ func SetTemplateProps(template *model.Template) error {
 		return err
 	}
 
+	// get all variables from other projects
+	outputVars, err := GetOutputVarsFromOtherProjects()
+	if err != nil {
+		return err
+	}
+
 	for _, property := range template.Properties {
 		if property.Required {
-			value, err := util.SimplePrompt(property.Prompt, property.Type == "boolean")
-			if err != nil {
-				return err
+			var value interface{}
+			valueSet := false
+
+			if property.CanHaveOutputVarValue {
+				useOutputVar := util.YesNoPrompt(fmt.Sprintf("Use Pulumi output from other projects for '%s'", util.Bold().Sprint(property.Description)))
+				if useOutputVar {
+					strValue, err := util.Select("Pulumi outputs", outputVars)
+					if err != nil {
+						return err
+					}
+					valueParts := strings.Split(strValue.(string), "/")
+					value = model.PropertyValue{
+						Value:                strValue,
+						IsPulumiOutput:       true,
+						PulumiStackReference: fmt.Sprintf("%s/%s", valueParts[0], valueParts[1]),
+						PulumiOutputVar:      valueParts[2],
+					}
+					valueSet = true
+				}
 			}
 
-			if property.Required && property.Type == "boolean" && value.(bool) && len(property.Requires) > 0 {
+			if !valueSet {
+				strValue, err := util.SimplePrompt(property.Prompt, property.Type == "boolean")
+				if err != nil {
+					return err
+				}
+				value = model.PropertyValue{
+					Value:                strValue,
+					IsPulumiOutput:       false,
+					PulumiStackReference: "",
+					PulumiOutputVar:      "",
+				}
+			}
+
+			if property.Required && property.Type == "boolean" && value.(model.PropertyValue).Value.(bool) && len(property.Requires) > 0 {
 				template.Properties = SetPropertiesRequired(template.Properties, property.Requires)
 			}
 
