@@ -59,3 +59,18 @@ func GetPulumiProjectVars(projectDir string) ([]string, error) {
 
 	return result, nil
 }
+
+func GetPulumiProjectVarsWithValues(projectDir string) (map[string]string, error) {
+	err, jsonOut := util.RunCmdInDir(projectDir, "pulumi", "stack", "output", "--show-secrets", "--json")
+	if err != nil {
+		return nil, err
+	}
+
+	jsonMap := make(map[string]string)
+	err = json.Unmarshal(jsonOut.Bytes(), &jsonMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonMap, nil
+}
