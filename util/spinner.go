@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"github.com/briandowns/spinner"
 	"github.com/kyokomi/emoji/v2"
 	"time"
@@ -13,7 +12,6 @@ func Loading(loadingFunc func(sp *spinner.Spinner) error, prefixEmoji string, lo
 	s.Start()
 	err := loadingFunc(s)
 	s.Stop()
-	fmt.Println()
 	if err != nil {
 		BoldRed().Println(emoji.Sprint(errorEmoji, loadingText, " - ", err))
 		return s, err

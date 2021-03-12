@@ -142,5 +142,9 @@ func InitProject(cmd *cobra.Command) error {
 		return err
 	}
 
+	util.EmojiPrintln(":thumbs_up:", "Now you're ready!")
+	util.EmojiPrintln(":robot:", "To start your project run the following:")
+	util.BoldGreen().Printf("cd %s && gocloud up\n", targetDir)
+
 	return nil
 }

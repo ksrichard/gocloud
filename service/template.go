@@ -178,7 +178,7 @@ func SetTemplateProps(template *model.Template) error {
 			var value interface{}
 			valueSet := false
 
-			if property.CanHaveOutputVarValue {
+			if property.CanHaveOutputVarValue && len(outputVars) > 0 {
 				useOutputVar := util.YesNoPrompt(fmt.Sprintf("Use Pulumi output from other projects for '%s'", util.Bold().Sprint(property.Description)))
 				if useOutputVar {
 					strValue, err := util.Select("Pulumi outputs", outputVars)
