@@ -70,10 +70,10 @@ func InitProject(cmd *cobra.Command) error {
 
 	// pass local login option to template generation
 	template.PropertyValues["pulumi_local_login"] = model.PropertyValue{
-		Value:                pulumiLocalLogin,
-		IsPulumiOutput:       false,
-		PulumiStackReference: "",
-		PulumiOutputVar:      "",
+		Value:                   pulumiLocalLogin,
+		IsPulumiOutput:          false,
+		PulumiStackReferenceVar: "",
+		PulumiOutputVar:         "",
 	}
 
 	// generate project files

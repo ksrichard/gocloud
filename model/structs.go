@@ -31,10 +31,15 @@ type Template struct {
 }
 
 type PropertyValue struct {
-	Value                interface{}
-	IsPulumiOutput       bool
-	PulumiStackReference string
-	PulumiOutputVar      string
+	Value                   interface{}
+	IsPulumiOutput          bool
+	PulumiStackReferenceVar string
+	PulumiOutputVar         string
+}
+
+type StackReference struct {
+	Reference string
+	VarName   string
 }
 
 type TemplateScript struct {

@@ -14,6 +14,7 @@ import (
 var TemplatesYamlFileName = "templates.yaml"
 var ProjectTemplateYamlFileName = "project.yaml"
 var ProjectYamlFileName = ".gocloud.yaml"
+var PulumiStackRefTempVar = "pulumi_stack_references"
 
 func GetTemplateProjectYaml(templateDir string) (*model.Templates, error) {
 	var templateProject model.Templates
@@ -173,6 +174,11 @@ func SetTemplateProps(template *model.Template) error {
 		return err
 	}
 
+	if template.PropertyValues == nil {
+		template.PropertyValues = make(map[string]interface{})
+	}
+	template.PropertyValues[PulumiStackRefTempVar] = []model.StackReference{}
+
 	for _, property := range template.Properties {
 		if property.Required {
 			var value interface{}
@@ -186,12 +192,31 @@ func SetTemplateProps(template *model.Template) error {
 						return err
 					}
 					valueParts := strings.Split(strValue.(string), "/")
+					currentStackReference := fmt.Sprintf("%s/%s", valueParts[0], valueParts[1])
+					stackReferenceVarName := fmt.Sprintf("%sStack", valueParts[1])
 					value = model.PropertyValue{
-						Value:                strValue,
-						IsPulumiOutput:       true,
-						PulumiStackReference: fmt.Sprintf("%s/%s", valueParts[0], valueParts[1]),
-						PulumiOutputVar:      valueParts[2],
+						Value:                   strValue,
+						IsPulumiOutput:          true,
+						PulumiStackReferenceVar: stackReferenceVarName,
+						PulumiOutputVar:         valueParts[2],
 					}
+
+					// put into stack references if not already put
+					stackRefs := template.PropertyValues[PulumiStackRefTempVar].([]model.StackReference)
+					stackRefVarFound := false
+					for _, ref := range stackRefs {
+						if ref.Reference == currentStackReference {
+							stackRefVarFound = true
+						}
+					}
+					if !stackRefVarFound {
+						stackRefs = append(stackRefs, model.StackReference{
+							Reference: currentStackReference,
+							VarName:   stackReferenceVarName,
+						})
+						template.PropertyValues[PulumiStackRefTempVar] = stackRefs
+					}
+
 					valueSet = true
 				}
 			}
@@ -202,10 +227,10 @@ func SetTemplateProps(template *model.Template) error {
 					return err
 				}
 				value = model.PropertyValue{
-					Value:                strValue,
-					IsPulumiOutput:       false,
-					PulumiStackReference: "",
-					PulumiOutputVar:      "",
+					Value:                   strValue,
+					IsPulumiOutput:          false,
+					PulumiStackReferenceVar: "",
+					PulumiOutputVar:         "",
 				}
 			}
 
