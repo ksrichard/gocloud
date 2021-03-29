@@ -107,8 +107,8 @@ func WriteProjectYaml(projectDir string, config *model.ProjectConfig) error {
 	return err
 }
 
-func ValidateRequired(input string, required bool) error {
-	if required && strings.TrimSpace(input) == "" {
+func ValidateRequired(input string, required bool, allowEmpty bool) error {
+	if !allowEmpty && required && strings.TrimSpace(input) == "" {
 		return util.BoldError("This property is required!")
 	}
 	return nil
@@ -117,6 +117,7 @@ func ValidateRequired(input string, required bool) error {
 func PopulatePrompts(template *model.Template) error {
 	for i, property := range template.Properties {
 		currentRequired := property.Required
+		currentAllowEmpty := property.AllowEmpty
 		switch strings.ToLower(property.Type) {
 		case "boolean":
 			template.Properties[i].Prompt = &promptui.Prompt{
@@ -129,7 +130,7 @@ func PopulatePrompts(template *model.Template) error {
 				Label: util.Bold().Sprint(property.Description),
 				Mask:  []rune("*")[0],
 				Validate: func(input string) error {
-					return ValidateRequired(input, currentRequired)
+					return ValidateRequired(input, currentRequired, currentAllowEmpty)
 				},
 			}
 			break
@@ -137,7 +138,7 @@ func PopulatePrompts(template *model.Template) error {
 			template.Properties[i].Prompt = &promptui.Prompt{
 				Label: util.Bold().Sprint(property.Description),
 				Validate: func(input string) error {
-					return ValidateRequired(input, currentRequired)
+					return ValidateRequired(input, currentRequired, currentAllowEmpty)
 				},
 			}
 			break
@@ -153,7 +154,7 @@ func SetPropertiesRequired(props []model.TemplateProperty, propNames []string) [
 			if property.Name == propName {
 				property.Required = true
 				property.Prompt.Validate = func(input string) error {
-					return ValidateRequired(input, true)
+					return ValidateRequired(input, true, property.AllowEmpty)
 				}
 				props[i] = property
 			}

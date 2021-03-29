@@ -52,6 +52,7 @@ type TemplateProperty struct {
 	Type                  string   `yaml:"type"`
 	Description           string   `yaml:"description"`
 	Required              bool     `yaml:"required"`
+	AllowEmpty            bool     `yaml:"allowEmpty"`
 	CanHaveOutputVarValue bool     `yaml:"canHaveOutputVarValue"`
 	Requires              []string `yaml:"requires"`
 	Prompt                *promptui.Prompt
